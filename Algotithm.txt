@@ -1,0 +1,36 @@
+MAZE ALGORITHM - IDEAL
+
+// UPDATING GRAPH
+Read LRF sensors
+Update graph based on LRF data (disconnect node connections if there is a wall)
+
+IF there is a package detected by color AND it is on a wall nearby:
+	Acknowledge package with long LED
+	deploy_package = true
+IF there is a package detected by heat AND it is on a wall nearby:
+	Acknowledge package with short LED
+	deploy_package = true
+IF deploy_package:
+	deploy package
+
+
+// FINDING NEXT NODE
+https://www.geeksforgeeks.org/depth-first-search-or-dfs-for-a-graph/
+
+// MOVING TO NEW NODE
+Move to next node
+WHILE moving:
+	Apply angular and positional correctional (Replace meme code with PID - ASK MATT)
+	IF black is detected:
+		STOP movement
+		Move back to center of previous tile
+		Mark black tile node as B (Disconnect all surrounding nodes)
+
+
+
+NODE TYPES:
+N - Normal
+B - Black (Treated like a walled box)
+V - Victim (Treated like N for traversal purposes)
+C - Checkpoint (Treat like N for 2018)
+T - Transitional (from first to second floor and vice versa)
