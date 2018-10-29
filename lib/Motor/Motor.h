@@ -13,8 +13,7 @@ private:
 public:
     Motor() {};
     void init(int en, int in1, int in2);
-    void set_direction(bool dir);
-    void set_speed(int speed);
+    void spin(int speed);
 };
 
 #endif      // MOTOR_H
