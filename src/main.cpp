@@ -5,11 +5,9 @@
 #include "Common.h"
 #include <Wire.h>
 // #include "Thermal.h"
-#include "ColorSensor.h"
 #include "MotorController.h"
 #include "LRF.h"
 #include "LightSensor.h"
-#include "LED.h"
 // #include "PID.h"
 
 
@@ -32,13 +30,6 @@ LRF distances[4] = {Sensor1, Sensor2, Sensor3, Sensor4};
 IMU mpu9250;
 // PID pid(1, 1, 1, 255);
 
-ColorSensor Color1;
-ColorSensor Color2;
-ColorSensor Color3;
-ColorSensor Color4;
-
-ColorSensor colors[4] = {Color1, Color2, Color3, Color4};
-
 LightSensor light_N(LIGHT_OUT_N);
 LightSensor light_E(LIGHT_OUT_E);
 LightSensor light_S(LIGHT_OUT_S);
@@ -46,11 +37,8 @@ LightSensor light_W(LIGHT_OUT_W);
 
 LightSensor lights[4] = {light_N, light_E, light_S, light_W};
 
-LED diode(LED_PIN);
-
 // Calibrated values
 uint16_t LIGHT_THRESHOLD[4] = {LIGHT_FRONT, LIGHT_RIGHT, LIGHT_BACK, LIGHT_LEFT};
-uint16_t COLOR_THRESHOLD[4] = {COLOR_FRONT, COLOR_RIGHT, COLOR_BACK, COLOR_LEFT};
 
 
 // Variable Initialisation
@@ -64,7 +52,6 @@ Vector2D permutations[4] = {{0,1}, {1,0}, {0,-1}, {-1,0}};
 // Current sensor readings
 uint16_t LRF_data[4];
 uint16_t light_data[4];
-IntVector3D colorsensor_data[4];
 double current_heading;
 int current_x = int(MAZE_X/2 + 0.5);
 int current_y = int(MAZE_Y/2 + 0.5);
@@ -73,7 +60,6 @@ int current_y = int(MAZE_Y/2 + 0.5);
 // Previous sensor readings
 uint16_t prev_LRF_data[4];
 uint16_t prev_light_data[4];
-IntVector3D prev_colorsensor_data[4];
 double prev_current_heading;
 
 
@@ -166,8 +152,6 @@ void delayWithIMU(int time_to_wait){
 }
 
 
-
-
 void setup()
 {   
     Wire.begin();
@@ -188,20 +172,6 @@ void setup()
 
     robot.init(&motor1, &motor2, &motor3, &motor4);
 
-
-    // Initialise Color distances
-    Color1.init(TCS230_Sensor1_S0, TCS230_Sensor1_S1, TCS230_Sensor1_S2, TCS230_Sensor1_S3, TCS230_Sensor1_OUT);
-    Color2.init(TCS230_Sensor2_S0, TCS230_Sensor2_S1, TCS230_Sensor2_S2, TCS230_Sensor2_S3, TCS230_Sensor2_OUT);
-    Color3.init(TCS230_Sensor3_S0, TCS230_Sensor3_S1, TCS230_Sensor3_S2, TCS230_Sensor3_S3, TCS230_Sensor3_OUT);
-    Color4.init(TCS230_Sensor4_S0, TCS230_Sensor4_S1, TCS230_Sensor4_S2, TCS230_Sensor4_S3, TCS230_Sensor4_OUT);
-
-    ColorSensor temp_colors[4] = {Color1, Color2, Color3, Color4};
-    
-    for(int i=0; i<4; i++) {
-        colors[i] = temp_colors[i];
-        // colors[i].calibrate();
-    }
-
     // Initialise LRFs
     LRFinit();
     
@@ -216,18 +186,8 @@ void loop() {
     // Read sensors (Except IMU)
     for(int i=0; i<4; i++) {
         LRF_data[i] = distances[i].readRangeSingleMillimeters();
-        colorsensor_data[i] = colors[i].readColor();
         light_data[i] = lights[i].readLight();
     }
-    
-    // Determine state of victims
-    // for(int i=0; i<4; i++) {
-    //     if(colorsensor_data[i].x < COLOR_THRESHOLD[i]) {
-    //         diode.setPower(255);
-    //         delayWithIMU(3000);
-    //         diode.setPower(0);
-    //     }
-    // }
 
     // Find a path
     dir_of_travel = findPath(current_x, current_y, prev_dir_of_travel);
@@ -263,7 +223,6 @@ void loop() {
     for(int i=0; i<4; i++) {
         prev_LRF_data[i] = LRF_data[i];
         prev_light_data[i] = light_data[i];
-        prev_colorsensor_data[i] = colorsensor_data[i];
     }
 
     prev_dir_of_travel = (dir_of_travel+2)%4;
