@@ -4,16 +4,12 @@
         {
             "name": "Win32",
             "includePath": [
-                "c:/Users/23518/OneDrive - Brisbane Boys&#039; College/2019 Maze code/include",
-                "c:/Users/23518/OneDrive - Brisbane Boys&#039; College/2019 Maze code/src",
                 "C:/Users/23518/.platformio/packages/framework-arduinoavr/cores/arduino",
                 "C:/Users/23518/.platformio/packages/framework-arduinoavr/variants/mega",
-                "c:/Users/23518/OneDrive - Brisbane Boys&#039; College/2019 Maze code/lib/ColorSensor",
                 "c:/Users/23518/OneDrive - Brisbane Boys&#039; College/2019 Maze code/lib/Common",
                 "c:/Users/23518/OneDrive - Brisbane Boys&#039; College/2019 Maze code/lib/Config",
                 "c:/Users/23518/OneDrive - Brisbane Boys&#039; College/2019 Maze code/lib/I2C",
                 "c:/Users/23518/OneDrive - Brisbane Boys&#039; College/2019 Maze code/lib/IMU",
-                "c:/Users/23518/OneDrive - Brisbane Boys&#039; College/2019 Maze code/lib/LED",
                 "c:/Users/23518/OneDrive - Brisbane Boys&#039; College/2019 Maze code/lib/LRF",
                 "c:/Users/23518/OneDrive - Brisbane Boys&#039; College/2019 Maze code/lib/LightSensor",
                 "c:/Users/23518/OneDrive - Brisbane Boys&#039; College/2019 Maze code/lib/Motor",
@@ -47,22 +43,20 @@
                 "C:/Users/23518/.platformio/packages/framework-arduinoavr/libraries/Temboo/src",
                 "C:/Users/23518/.platformio/packages/framework-arduinoavr/libraries/WiFi/src",
                 "C:/Users/23518/.platformio/packages/tool-unity",
+                "c:/Users/23518/OneDrive - Brisbane Boys&#039; College/2019 Maze code/include",
+                "c:/Users/23518/OneDrive - Brisbane Boys&#039; College/2019 Maze code/src",
                 ""
             ],
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": "${workspaceRoot}/.vscode/.browse.c_cpp.db",
                 "path": [
-                    "c:/Users/23518/OneDrive - Brisbane Boys&#039; College/2019 Maze code/include",
-                    "c:/Users/23518/OneDrive - Brisbane Boys&#039; College/2019 Maze code/src",
                     "C:/Users/23518/.platformio/packages/framework-arduinoavr/cores/arduino",
                     "C:/Users/23518/.platformio/packages/framework-arduinoavr/variants/mega",
-                    "c:/Users/23518/OneDrive - Brisbane Boys&#039; College/2019 Maze code/lib/ColorSensor",
                     "c:/Users/23518/OneDrive - Brisbane Boys&#039; College/2019 Maze code/lib/Common",
                     "c:/Users/23518/OneDrive - Brisbane Boys&#039; College/2019 Maze code/lib/Config",
                     "c:/Users/23518/OneDrive - Brisbane Boys&#039; College/2019 Maze code/lib/I2C",
                     "c:/Users/23518/OneDrive - Brisbane Boys&#039; College/2019 Maze code/lib/IMU",
-                    "c:/Users/23518/OneDrive - Brisbane Boys&#039; College/2019 Maze code/lib/LED",
                     "c:/Users/23518/OneDrive - Brisbane Boys&#039; College/2019 Maze code/lib/LRF",
                     "c:/Users/23518/OneDrive - Brisbane Boys&#039; College/2019 Maze code/lib/LightSensor",
                     "c:/Users/23518/OneDrive - Brisbane Boys&#039; College/2019 Maze code/lib/Motor",
@@ -96,11 +90,13 @@
                     "C:/Users/23518/.platformio/packages/framework-arduinoavr/libraries/Temboo/src",
                     "C:/Users/23518/.platformio/packages/framework-arduinoavr/libraries/WiFi/src",
                     "C:/Users/23518/.platformio/packages/tool-unity",
+                    "c:/Users/23518/OneDrive - Brisbane Boys&#039; College/2019 Maze code/include",
+                    "c:/Users/23518/OneDrive - Brisbane Boys&#039; College/2019 Maze code/src",
                     ""
                 ]
             },
             "defines": [
-                "PLATFORMIO=30601",
+                "PLATFORMIO=30602",
                 "ARDUINO_AVR_MEGA2560",
                 "F_CPU=16000000L",
                 "ARDUINO_ARCH_AVR",
