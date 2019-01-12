@@ -12,20 +12,17 @@ void Motor::init(int en, int in1, int in2)
     pinMode(_in2, OUTPUT);
 }
 
-void Motor::set_direction(bool dir=true)
+void Motor::spin(int speed) 
 {
-    if (!dir) {      // Foward movement
+    if(speed >= 0) {
         digitalWrite(_in1, HIGH);
         digitalWrite(_in2, LOW);
-    } else {        // Reverse movement
-        digitalWrite(_in2, HIGH);
+    } else {
         digitalWrite(_in1, LOW);
+        digitalWrite(_in2, HIGH);
     }
-}
 
 
-void Motor::set_speed(int speed)
-{
     speed = abs(speed);
     analogWrite(_en, speed);
 }
