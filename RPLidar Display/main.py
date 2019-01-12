@@ -73,8 +73,8 @@ class Plotter(threading.Thread):
         self.fig = plt.figure()
         self.ax = self.fig.add_subplot(111, projection='polar')
         self.line, = self.ax.plot([], [])
-        self.ax.set_ylim(0, 10000)
-        self.ax.set_rticks([2000, 4000, 6000, 8000, 10000])
+        self.ax.set_ylim(0, 2000)
+        self.ax.set_rticks([500, 1000, 1500, 2000])
 
         #Autoscale on unknown axis and known lims on the other
         # self.ax.set_autoscaley_on(True)
@@ -99,7 +99,7 @@ class Plotter(threading.Thread):
                     tdata.append(key)
 
                 # Update data (with the new _and_ the old points)
-                self.ax.scatter(tdata, rdata)
+                self.ax.scatter(tdata, rdata, s=2)
                 # Need both of these in order to rescale
                 self.ax.relim()
                 self.ax.autoscale_view()
