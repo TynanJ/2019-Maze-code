@@ -7,6 +7,8 @@ import threading
 import queue
 
 
+plt.ion()
+
 
 ser = serial.Serial("COM5", 115200)
 # prev_angle = -1
@@ -17,74 +19,109 @@ queueLock = threading.Lock()
 threads = []
 
 class LidarData(threading.Thread):
-    def __init__(self, threadID, name, counter):
+    def __init__(self, threadID, name):
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.name = name
-        self.counter = counter
 
 
     def run(self):
         print("Starting:", self.name)
+        while True:
+            data = ser.readline().rstrip()
 
-        data = ser.readline().rstrip()
+            # Convert data to list of floats
+            try:
+                data = data.decode()
+            except UnicodeDecodeError:
+                continue
 
-        # Convert data to list of floats
-        try:
-            data = data.decode()
-        except UnicodeDecodeError:
-            return
+            try:
+                data = list(map(float, data.split(',')))
+            except ValueError:
+                continue
 
-        try:
-            data = list(map(float, data.split(',')))
-        except ValueError:
-            return
+            # Collect data into a full map of 360 degrees
+            try:
+                # if data[3] < 10:
+                #     continue
 
-        # Collect data into a full map of 360 degrees
-        angle = round(data[0])
-        dist = data[1]
+                angle = round(data[0])
+                dist = data[1]
 
-        if angle <= 360:
-            dataQue.put((angle, dist))
+            except IndexError:
+                continue
+
+            if angle <= 360:
+                queueLock.acquire()
+                dataQue.put((angle, dist))
+                queueLock.release()
 
 
 class Plotter(threading.Thread):
-    def __init__(self, threadID, name, counter):
+    def __init__(self, threadID, name):
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.name = name
-        self.counter = counter
+        self.min_x = 0
+        self.max_x = 360
 
         self.all_data = {}
 
     def run(self):
-        # Read new values from que into all_data
-        queueLock.acquire()
-        for i in range(dataQue.qsize()):
-            new_data = dataQue.get()
-            self.all_data[new_data[0]] = new_data[1]
-        queueLock.release()
+        # Setup
+        self.fig = plt.figure()
+        self.ax = self.fig.add_subplot(111, projection='polar')
+        self.line, = self.ax.plot([], [])
+        self.ax.set_ylim(0, 10000)
+        self.ax.set_rticks([2000, 4000, 6000, 8000, 10000])
 
-        print(self.all_data)
+        #Autoscale on unknown axis and known lims on the other
+        # self.ax.set_autoscaley_on(True)
+
+        while True:
+            # Read new values from que into all_data
+            if not dataQue.empty():
+                queueLock.acquire()
+                for i in range(dataQue.qsize()):
+                    new_data = dataQue.get()
+                    # convert degrees to radians
+                    angle = new_data[0] * (np.pi / 180)
+                    self.all_data[angle] = new_data[1]
+
+                queueLock.release()
+
+                rdata = []
+                tdata = []
+
+                for key, value in self.all_data.items():
+                    rdata.append(value)
+                    tdata.append(key)
+
+                # Update data (with the new _and_ the old points)
+                self.ax.scatter(tdata, rdata)
+                # Need both of these in order to rescale
+                self.ax.relim()
+                self.ax.autoscale_view()
+                # We need to draw *and* flush
+                self.fig.canvas.draw()
+                self.fig.canvas.flush_events()
+
+
 
 
 # Create threads
 # Create new threads
-Lidar = LidarData(1, "Lidar", 1)
-MatLab = Plotter(2, "MatLab", 2)
-
-# Start new Threads
-Lidar.start()
-MatLab.start()
+Lidar = LidarData(1, "Lidar")
+MatLab = Plotter(2, "MatLab")
 
 # Add threads to thread list
 threads.append(Lidar)
 threads.append(MatLab)
 
-# Wait for all threads to complete
-for t in threads:
-   t.join()
-print ("Exiting Main Thread")
+# Start new Threads
+Lidar.start()
+MatLab.start()
 
 
 
