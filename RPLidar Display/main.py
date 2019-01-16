@@ -8,8 +8,6 @@ import queue
 
 
 plt.ion()
-
-
 ser = serial.Serial("COM5", 115200)
 # prev_angle = -1
 # full_view = {}
@@ -65,49 +63,45 @@ class Plotter(threading.Thread):
         self.name = name
         self.min_x = 0
         self.max_x = 360
+        self.IMIN = 0
+        self.IMAX = 50
 
         self.all_data = {}
 
-    def run(self):
-        # Setup
-        self.fig = plt.figure()
-        self.ax = self.fig.add_subplot(111, projection='polar')
-        self.line, = self.ax.plot([], [])
-        self.ax.set_ylim(0, 2000)
-        self.ax.set_rticks([500, 1000, 1500, 2000])
+    def update_line(self, line):
+        # Read fresh data
+        queueLock.acquire()
+        for i in range(dataQue.qsize()):
+            new_data = dataQue.get()
+            # convert degrees to radians
+            self.all_data[new_data[0]] = new_data[1]
 
-        #Autoscale on unknown axis and known lims on the other
-        # self.ax.set_autoscaley_on(True)
+        queueLock.release()
+
+        # Flatten all_data
+        scan = [tuple([key] + list(value)) for key, value in self.all_data.items()]
+        print(scan)
+
+        offsets = np.array([(np.radians(meas[0]), meas[1]) for meas in scan])
+        line.set_offsets(offsets)
+        intens = np.array([meas[2] for meas in scan])
+        line.set_array(intens)
+        return line,
+
+
+    def run(self):
+        fig = plt.figure()
+        ax = plt.subplot(111, projection='polar')
+        line = ax.scatter([0, 0], [0, 0], s=5, c=[self.IMIN, self.IMAX],
+                          cmap=plt.cm.Greys_r, lw=0)
+        ax.set_rmax(4000)
+        ax.grid(True)
 
         while True:
-            # Read new values from que into all_data
-            if not dataQue.empty():
-                queueLock.acquire()
-                for i in range(dataQue.qsize()):
-                    new_data = dataQue.get()
-                    # convert degrees to radians
-                    angle = new_data[0] * (np.pi / 180)
-                    self.all_data[angle] = new_data[1]
-
-                queueLock.release()
-
-                rdata = []
-                tdata = []
-
-                for key, value in self.all_data.items():
-                    rdata.append(value)
-                    tdata.append(key)
-
-                # Update data (with the new _and_ the old points)
-                self.ax.scatter(tdata, rdata, s=2)
-                # Need both of these in order to rescale
-                self.ax.relim()
-                self.ax.autoscale_view()
-                # We need to draw *and* flush
-                self.fig.canvas.draw()
-                self.fig.canvas.flush_events()
-
-
+            # Update line
+            self.update_line(line)
+        plt.show()
+        print("Stopping Lidar")
 
 
 # Create threads
@@ -123,105 +117,3 @@ threads.append(MatLab)
 Lidar.start()
 MatLab.start()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#
-#
-#
-# # Matlab Boilerplate
-# # fig = plt.figure()
-# # ax = fig.subplot(111)
-#
-#
-#
-# def update(data):
-#     # Convert dict to xs and ys
-#     print(data)
-#     # line.set_xdata()
-#     # angs = []
-#     # rs = []
-#     # for key, value in data.items():
-#     #     angs.append(key)
-#     #     rs.append(value)
-#
-#     # Plot the data
-#     # theta = list(full_view.keys())
-#     # r = list(full_view.values())
-#     #
-#     # ax.plot(theta, r, 'ro')
-#     #
-#     # plt.show()
-#
-#     # ani = animation.FuncAnimation(fig, update, frames=[(key, value) for key, value in full_view.items()])
-#
-# # full_view = {}
-# # fig = plt.figure()
-# # ax = fig.add_subplot(1,1,1)
-# #
-# #
-#
-# while True:
-#     data = ser.readline().rstrip()
-#
-#     # Convert data to list of floats
-#     try:
-#         data = data.decode()
-#     except UnicodeDecodeError:
-#         continue
-#
-#     try:
-#         data = list(map(float, data.split(',')))
-#     except ValueError:
-#         continue
-#
-#     # Collect data into a full map of 360 degrees
-#     angle = data[0]
-#     dist = data[1]
-#
-#
-#     if angle <= 360:
-#         full_view[angle] = dist
-#
-#     print(full_view)
-# #     theta = list(full_view.keys())
-# #     r = list(full_view.values())
-# #
-# #     ax.clear()
-# #     ax.plot(theta, r, 'ro')
-# #
-# #     print(theta, ':', r)
-# #
-# # while True:
-# #     a = animation.FuncAnimation(fig, update, repeat=False)
-#     plt.show()
