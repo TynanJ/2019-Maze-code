@@ -5,12 +5,12 @@ import serial
 import threading
 import queue
 
-ser = serial.Serial("COM5", 115200)
+ser = serial.Serial("COM4", 115200)
 
 dataQue = queue.Queue()
 queueLock = threading.Lock()
 threads = []
-all_data = {0: (0, 0, 0)}
+# all_data = {0: (0, 0, 0)}
 
 DMAX = 1000
 IMIN = 0
@@ -80,14 +80,15 @@ class Plotter:
         self.threadID = threadID
         self.name = name
 
+        self.all_data = {0: (0,0,0)}
+
     def update_line(self, num, iterator, line):
-        global all_data
         while True:
             if queueLock.acquire(timeout=1):
                 for i in range(dataQue.qsize()):
                     new_data = dataQue.get()
 
-                    all_data[round(new_data[0])] = new_data[1:]
+                    self.all_data[round(new_data[0])] = new_data[1:]
                 # scan = all_data.copy()
                 # Clear queue
                 clear(dataQue)
@@ -98,7 +99,7 @@ class Plotter:
                 continue
 
             # Flatten data into array
-            scan = [tuple([key] + list(value)) for key, value in all_data.items()]
+            scan = [tuple([key] + list(value)) for key, value in self.all_data.items()]
 
             try:
                 offsets = np.array([(np.radians(meas[0]), meas[1]) for meas in scan])
@@ -121,7 +122,7 @@ class Plotter:
 
         iterable = []
         ani = animation.FuncAnimation(fig, self.update_line,
-            fargs=(iterable, line), interval=50 , blit=True)
+            fargs=(iterable, line), interval=20 , blit=True)
         plt.show()
 
 
@@ -137,5 +138,3 @@ if __name__ == '__main__':
     # Start new Threads
     Lidar.start()
     MatLab.run()
-
-    print("Threads started")
